@@ -1,8 +1,6 @@
 package com.example.hello;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +13,14 @@ import java.nio.file.Paths;
 @RestController
 public class HelloController {
 
+    private final CounterRepository counterRepository;
+
+    public HelloController(CounterRepository counterRepository) {
+        this.counterRepository = counterRepository;
+    }
+
     @GetMapping("/")
+    @Transactional
     public String hello() {
         String name = "";
         try {
@@ -24,6 +29,11 @@ public class HelloController {
         } catch (IOException e) {
             name = "Unknown";
         }
-        return "Hello World! " + name;
+
+        counterRepository.incrementByName("page_views");
+        Counter counter = counterRepository.findByName("page_views").orElse(null);
+        long count = (counter != null) ? counter.getValue() : 0;
+
+        return "Hello World! " + name + " count: " + count;
     }
 }
