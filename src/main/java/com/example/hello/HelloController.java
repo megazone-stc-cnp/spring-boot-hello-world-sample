@@ -34,6 +34,6 @@ public class HelloController {
         Counter counter = counterRepository.findByName("page_views").orElse(null);
         long count = (counter != null) ? counter.getValue() : 0;
 
-        return "Hello World! " + name + " count: " + count;
+        return "Hello World! " + name + " ( count: " + count + ")";
     }
 }
